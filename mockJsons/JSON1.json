@@ -1,11 +1,6 @@
 {
-  "Root": {
-    "dataModel": []
-  },
-
-  "Master_Font_Foundry_Production": [
-    {
-      "Master Foundry ID": 12
-    }
-  ]
+    "modelId": "DS-001",
+    "modelName": "DeepSeekNet",
+    "trainingDataSize": "50GB",
+    "platform": "AWS"
 }

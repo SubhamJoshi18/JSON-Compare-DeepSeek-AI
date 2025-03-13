@@ -1,11 +1,6 @@
 {
-  "Root": {
-    "dataModel": []
-  },
-
-  "Master_Font_Foundry_Production": [
-    {
-      "Master Foundry ID": 15
-    }
-  ]
+  "modelId": "DS-002",
+  "modelName": "DeepSeekBeta",
+  "trainingDataSize": "5GB",
+  "platform": "LocalServer"
 }

@@ -5,7 +5,6 @@ import {
 } from "../constants/deepseek.constant";
 import { jsonLogger } from "./logger.libs";
 import { clearDirectory } from "../utils/files.utilts";
-import { retryRequest } from "../decorator/retry.decorator";
 
 const CHUNK_SIZE = 1000;
 
@@ -129,7 +128,11 @@ async function compareTheJsonWithoutChunk(
 
       const deepSeekResponse = response.data.choices[0].message.content;
       const modifiedString = deepSeekResponse.toString().split("```json")[1];
+      if (!modifiedString) throw new Error();
+
       const finalModifiedString = modifiedString.replace("```", " ");
+      console.log(finalModifiedString)
+      if (!finalModifiedString) throw new Error();
 
       return finalModifiedString;
     } catch (err) {
