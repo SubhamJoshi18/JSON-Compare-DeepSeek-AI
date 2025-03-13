@@ -9,8 +9,14 @@ const compareJsonRouter = Router();
 
 compareJsonRouter.post(
   "/compare-json",
-  upload.array("json", 2),
+  upload.none(),
   CompareJsonController.compareTheJson as any
+);
+
+compareJsonRouter.post(
+  "/compare-json-postman",
+  upload.array("json", 2),
+  CompareJsonController.compareTheJsonPostman as any
 );
 
 export default compareJsonRouter;

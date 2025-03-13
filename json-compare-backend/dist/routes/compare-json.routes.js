@@ -9,5 +9,5 @@ const multer_config_1 = __importDefault(require("../config/multer.config"));
 const compareJsonController_1 = __importDefault(require("../controller/compareJsonController"));
 const upload = (0, multer_1.default)({ storage: multer_config_1.default });
 const compareJsonRouter = (0, express_1.Router)();
-compareJsonRouter.post("/compare-json", upload.array("json", 2), compareJsonController_1.default.compareTheJson);
+compareJsonRouter.post("/compare-json", upload.none(), compareJsonController_1.default.compareTheJson);
 exports.default = compareJsonRouter;

@@ -3,7 +3,7 @@ import compareTheJSON from "../libs/deepseek.libs";
 import { validateJson } from "../libs/jsonvalidate.libs";
 
 class CompareJsonServices {
-  public async compareJson(fileContent: Express.Multer.File[]) {
+  public async compareJsonPostman(fileContent: Express.Multer.File[]) {
     if (!fileContent || fileContent.length === 0) {
       throw new JSONExceptions(
         `There is not two json ,Please Enter Two Json to be Compare`
@@ -34,6 +34,22 @@ class CompareJsonServices {
 
     if (!validStatus) throw new JSONExceptions(`The JSON is not valid`);
 
+    const jsonResponse = await compareTheJSON(firstJson, secondJson);
+
+    return jsonResponse;
+  }
+
+  public async compareJson(fileContent: any[]) {
+    const extractedContent = fileContent.pop();
+    console.log(extractedContent);
+    if (!extractedContent || extractedContent.length === 0) {
+      throw new JSONExceptions(
+        `There is not two json ,Please Enter Two Json to be Compare`
+      );
+    }
+
+    const firstJson = extractedContent[0];
+    const secondJson = extractedContent[1];
     const jsonResponse = await compareTheJSON(firstJson, secondJson);
 
     return jsonResponse;

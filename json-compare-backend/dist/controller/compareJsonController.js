@@ -18,12 +18,15 @@ class CompareJsonController {
     compareTheJson(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const fileContent = req.files;
-                const apiResponse = yield compareJsonServices_1.default.compareJson(fileContent);
+                const json1 = req.body.json1 ? JSON.parse(req.body.json1) : null;
+                const json2 = req.body.json2 ? JSON.parse(req.body.json2) : null;
+                const jsonarr = new Array([json1, json2]);
+                const apiResponse = yield compareJsonServices_1.default.compareJson(jsonarr);
                 const contentMessage = `The JSON Has been Compared`;
                 return (0, response_utils_1.sendApiResponse)(res, apiResponse, contentMessage);
             }
             catch (err) {
+                console.log(err);
                 next(err);
             }
         });

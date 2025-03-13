@@ -50,13 +50,23 @@ function App() {
     setError("");
 
     const formData = new FormData();
-    formData.append("json", jsonData1);
-    formData.append("json", jsonData2);
+
+    console.log("This is the json data 1", jsonData1);
+    console.log("This is the json data 2", jsonData2);
+
+    // Append each JSON file with a unique key
+    formData.append("json1", JSON.stringify(jsonData1)); // For the first JSON file
+    formData.append("json2", JSON.stringify(jsonData2)); // For the second JSON file
 
     try {
-      const response = await axios.post(BACKEND_URL, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        BACKEND_URL + "/compare-json",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       const result = await response.data;
       setComparisonResult(result);
     } catch (err) {
