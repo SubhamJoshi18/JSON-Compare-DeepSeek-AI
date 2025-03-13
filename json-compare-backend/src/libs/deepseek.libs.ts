@@ -72,9 +72,25 @@ const compareTheJSON = async (firstJson: object, secondJson: object) => {
       stringFirstJson,
       stringSecondJson
     );
+
+    const parseContent = JSON.parse(responseData);
+
     await clearDirectory();
 
-    return JSON.parse(responseData);
+    const description = {
+      Description: "Description",
+      added: "Fields present in JSON 2 but not in JSON 1.",
+      removed: "Fields present in JSON 1 but not in JSON 2.",
+      modified:
+        "Fields with different values, showing the previous and current values.",
+    };
+
+    const finalResult = {
+      description: description,
+      deepseekResponse: parseContent,
+    };
+
+    return finalResult;
   }
 };
 
@@ -106,7 +122,7 @@ Ensure the output is valid JSON with no additional text, explanations, or format
     });
     const deepSeekResponse = response.data.choices[0].message.content;
     const modifiedString = deepSeekResponse.toString().split("```json")[1];
-    const finalModifiedString = modifiedString.replace("```", "");
+    const finalModifiedString = modifiedString.replace("```", " ");
     return finalModifiedString;
   } catch (err) {
     jsonLogger.error("Error calling DeepSeek API:", err);

@@ -66,8 +66,19 @@ const compareTheJSON = (firstJson, secondJson) => __awaiter(void 0, void 0, void
     }
     else {
         const responseData = yield compareTheJsonWithoutChunk(stringFirstJson, stringSecondJson);
+        const parseContent = JSON.parse(responseData);
         yield (0, files_utilts_1.clearDirectory)();
-        return JSON.parse(responseData);
+        const description = {
+            Description: "Description",
+            added: "Fields present in JSON 2 but not in JSON 1.",
+            removed: "Fields present in JSON 1 but not in JSON 2.",
+            modified: "Fields with different values, showing the previous and current values.",
+        };
+        const finalResult = {
+            description: description,
+            deepseekResponse: parseContent,
+        };
+        return finalResult;
     }
 });
 const compareTheJsonWithoutChunk = (firstJson, secondJson) => __awaiter(void 0, void 0, void 0, function* () {
@@ -95,7 +106,7 @@ Ensure the output is valid JSON with no additional text, explanations, or format
         });
         const deepSeekResponse = response.data.choices[0].message.content;
         const modifiedString = deepSeekResponse.toString().split("```json")[1];
-        const finalModifiedString = modifiedString.replace("```", "");
+        const finalModifiedString = modifiedString.replace("```", " ");
         return finalModifiedString;
     }
     catch (err) {
