@@ -15,6 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const compareJsonServices_1 = __importDefault(require("../services/compareJsonServices"));
 const response_utils_1 = require("../utils/response.utils");
 class CompareJsonController {
+    compareTheJsonPostman(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const fileContent = req.files;
+                const apiResponse = yield compareJsonServices_1.default.compareJsonPostman(fileContent);
+                const contentMessage = `The JSON Has been Compared`;
+                return (0, response_utils_1.sendApiResponse)(res, apiResponse, contentMessage);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+    }
     compareTheJson(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

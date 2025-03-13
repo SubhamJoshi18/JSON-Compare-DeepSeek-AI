@@ -77,16 +77,7 @@ const compareTheJSON = async (firstJson: object, secondJson: object) => {
 
     await clearDirectory();
 
-    const description = {
-      Description: "Description",
-      added: "Fields present in JSON 2 but not in JSON 1.",
-      removed: "Fields present in JSON 1 but not in JSON 2.",
-      modified:
-        "Fields with different values, showing the previous and current values.",
-    };
-
     const finalResult = {
-      description: description,
       deepseekResponse: parseContent,
     };
 
@@ -103,7 +94,7 @@ async function compareTheJsonWithoutChunk(
 
   while (attempt < maxRetries) {
     try {
-      const prompt = `Compare the following two JSON objects and return only a structured JSON output highlighting the differences.
+      const prompt = `You are tasked with comparing two JSON objects. Provide a structured JSON output that highlights only the differences between the two objects. The output must strictly follow this format and contain only the specified fields.
 
       JSON 1:
       ${firstJson}
@@ -111,14 +102,14 @@ async function compareTheJsonWithoutChunk(
       JSON 2:
       ${secondJson}
 
-      Output strictly in the following JSON format:
+      Output in this exact JSON format:
       {
         "added": { /* Fields present in JSON 2 but not in JSON 1 */ },
         "removed": { /* Fields present in JSON 1 but not in JSON 2 */ },
-        "modified": { /* Fields with different values, showing before and after */ }
+        "modified": { /* Fields with different values in JSON 1 and JSON 2 */ }
       }
 
-      Ensure the output is valid JSON with no additional text, explanations, or formatting outside this structure.`;
+      Strictly avoid any extra explanation, comments, or formatting outside of the specified JSON structure. Ensure the output is valid JSON, with no additional text or clarifications. The response must be only the JSON, and nothing else.`;
 
       const response = await axios.post(DEEPSEEK_API_URL, {
         messages: [{ role: "user", content: prompt }],
@@ -130,8 +121,9 @@ async function compareTheJsonWithoutChunk(
       const modifiedString = deepSeekResponse.toString().split("```json")[1];
       if (!modifiedString) throw new Error();
 
-      const finalModifiedString = modifiedString.replace("```", " ");
-      console.log(finalModifiedString)
+      let finalModifiedString = modifiedString.replace("```", " ");
+      finalModifiedString = finalModifiedString.replace("=>", ":");
+      console.log(finalModifiedString);
       if (!finalModifiedString) throw new Error();
 
       return finalModifiedString;

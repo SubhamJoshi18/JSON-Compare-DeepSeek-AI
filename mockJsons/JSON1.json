@@ -1,6 +1,5 @@
 {
-    "modelId": "DS-001",
-    "modelName": "DeepSeekNet",
-    "trainingDataSize": "50GB",
-    "platform": "AWS"
+  "modelId": "DS-001",
+  "modelName": "DeepSeekNet",
+  "trainingDataSize": "50GB"
 }

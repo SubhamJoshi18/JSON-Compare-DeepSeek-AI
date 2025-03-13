@@ -14,7 +14,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const exceptions_1 = require("../exceptions");
 const deepseek_libs_1 = __importDefault(require("../libs/deepseek.libs"));
+const jsonvalidate_libs_1 = require("../libs/jsonvalidate.libs");
 class CompareJsonServices {
+    compareJsonPostman(fileContent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!fileContent || fileContent.length === 0) {
+                throw new exceptions_1.JSONExceptions(`There is not two json ,Please Enter Two Json to be Compare`);
+            }
+            const jsonFiles = fileContent.map((data) => {
+                return {
+                    filePath: data.path,
+                };
+            });
+            const validMimeTypeAndJson = fileContent.filter((data) => !(data.mimetype.split("/")[1] === "json" &&
+                data.originalname.endsWith("json")));
+            if (Array.isArray(validMimeTypeAndJson) && validMimeTypeAndJson.length > 0)
+                throw new exceptions_1.JSONExceptions(`The Provided File Should be JSON, Enter the Appropriate JSON`);
+            const { validStatus, firstJson, secondJson } = yield (0, jsonvalidate_libs_1.validateJson)(jsonFiles);
+            if (!validStatus)
+                throw new exceptions_1.JSONExceptions(`The JSON is not valid`);
+            const jsonResponse = yield (0, deepseek_libs_1.default)(firstJson, secondJson);
+            return jsonResponse;
+        });
+    }
     compareJson(fileContent) {
         return __awaiter(this, void 0, void 0, function* () {
             const extractedContent = fileContent.pop();
