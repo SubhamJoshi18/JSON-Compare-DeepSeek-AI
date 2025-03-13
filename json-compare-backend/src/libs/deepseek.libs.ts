@@ -5,6 +5,7 @@ import {
 } from "../constants/deepseek.constant";
 import { jsonLogger } from "./logger.libs";
 import { clearDirectory } from "../utils/files.utilts";
+import { retryRequest } from "../decorator/retry.decorator";
 
 const CHUNK_SIZE = 1000;
 
@@ -94,40 +95,57 @@ const compareTheJSON = async (firstJson: object, secondJson: object) => {
   }
 };
 
-const compareTheJsonWithoutChunk = async (
+async function compareTheJsonWithoutChunk(
   firstJson: string,
   secondJson: string
-) => {
-  try {
-    const prompt = `Compare the following two JSON objects and return only a structured JSON output highlighting the differences.
+) {
+  const maxRetries = 5;
+  let attempt = 0;
 
-JSON 1:
-${firstJson}
+  while (attempt < maxRetries) {
+    try {
+      const prompt = `Compare the following two JSON objects and return only a structured JSON output highlighting the differences.
 
-JSON 2:
-${secondJson}
+      JSON 1:
+      ${firstJson}
 
-Output strictly in the following JSON format:
-{
-  "added": { /* Fields present in JSON 2 but not in JSON 1 */ },
-  "removed": { /* Fields present in JSON 1 but not in JSON 2 */ },
-  "modified": { /* Fields with different values, showing before and after */ }
-}
+      JSON 2:
+      ${secondJson}
 
-Ensure the output is valid JSON with no additional text, explanations, or formatting outside this structure.`;
-    const response = await axios.post(DEEPSEEK_API_URL, {
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 500,
-      temperature: 0.7,
-    });
-    const deepSeekResponse = response.data.choices[0].message.content;
-    const modifiedString = deepSeekResponse.toString().split("```json")[1];
-    const finalModifiedString = modifiedString.replace("```", " ");
-    return finalModifiedString;
-  } catch (err) {
-    jsonLogger.error("Error calling DeepSeek API:", err);
-    throw err;
+      Output strictly in the following JSON format:
+      {
+        "added": { /* Fields present in JSON 2 but not in JSON 1 */ },
+        "removed": { /* Fields present in JSON 1 but not in JSON 2 */ },
+        "modified": { /* Fields with different values, showing before and after */ }
+      }
+
+      Ensure the output is valid JSON with no additional text, explanations, or formatting outside this structure.`;
+
+      const response = await axios.post(DEEPSEEK_API_URL, {
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 500,
+        temperature: 0.7,
+      });
+
+      const deepSeekResponse = response.data.choices[0].message.content;
+      const modifiedString = deepSeekResponse.toString().split("```json")[1];
+      const finalModifiedString = modifiedString.replace("```", " ");
+
+      return finalModifiedString;
+    } catch (err) {
+      attempt += 1;
+      jsonLogger.error(`Error calling DeepSeek API (Attempt ${attempt}):`, err);
+
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        jsonLogger.info(`Retrying in ${delay / 1000} seconds...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        jsonLogger.error("Max retry attempts reached. Throwing error.");
+        throw err;
+      }
+    }
   }
-};
+}
 
 export default compareTheJSON;
